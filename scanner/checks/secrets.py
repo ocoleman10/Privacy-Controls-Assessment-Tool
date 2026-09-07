@@ -27,7 +27,11 @@ _PROVIDER_PATTERNS: list[tuple[str, re.Pattern]] = [
 ]
 
 _GENERIC_CREDENTIAL_RE = re.compile(
-    r"(?i)\b(password|passwd|secret|api[_-]?key|access[_-]?token|auth[_-]?token)\b"
+    # No leading \b: real identifiers are routinely underscore-prefixed
+    # (db_password, admin_secret) and underscore counts as a word character,
+    # so a leading \b would never see a boundary there and the keyword would
+    # silently fail to match the common case.
+    r"(?i)(password|passwd|secret|api[_-]?key|access[_-]?token|auth[_-]?token)\b"
     r"\s*[:=]\s*['\"]([^'\"\s]{6,})['\"]"
 )
 
