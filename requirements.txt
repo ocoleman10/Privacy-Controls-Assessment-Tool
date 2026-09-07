@@ -1,0 +1,7 @@
+# Core scanner has zero third-party runtime dependencies (Python stdlib only).
+# That's deliberate: a security-assessment tool shouldn't carry its own
+# supply-chain risk. The optional --online advisory check calls osv.dev
+# directly over urllib rather than pulling in a client library.
+
+# Dev/test tooling only:
+pytest>=7.4

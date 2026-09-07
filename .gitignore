@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+
+# Generated reports are run output, not source. Keep the folder, ignore the contents.
+reports/*.md
+reports/*.json
+!reports/.gitkeep
