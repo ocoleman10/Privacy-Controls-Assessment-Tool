@@ -15,7 +15,7 @@ from pathlib import Path
 
 from scanner.checks.base import Check, make_finding
 from scanner.finding import Finding
-from scanner.util import iter_text_files, read_text_safe
+from scanner.util import iter_text_files, read_text_safe, relative_asset_path
 
 CHECK_ID = "PCAT-SECRET"
 
@@ -52,7 +52,7 @@ class HardcodedSecretsCheck(Check):
             text = read_text_safe(path)
             if text is None:
                 continue
-            rel = path.relative_to(target)
+            rel = relative_asset_path(path, target)
             for lineno, line in enumerate(text.splitlines(), start=1):
                 if any(hint in line for hint in _ENV_LOOKUP_HINTS):
                     continue

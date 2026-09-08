@@ -23,6 +23,17 @@ def test_run_scan_produces_expected_shape(sample_target):
     assert ids == [f"PCAT-{i:04d}" for i in range(1, len(findings) + 1)]
 
 
+def test_run_scan_against_a_single_file_target(sample_target):
+    # Regression test: Path.rglob() (which every check uses internally)
+    # silently yields nothing when target is a file rather than a
+    # directory — pointing the CLI at sample_target/app.py used to produce
+    # 0 findings instead of the 4 it actually contains.
+    findings = run_scan(sample_target / "app.py")
+
+    assert len(findings) == 4
+    assert all(f.affected_asset == "app.py" for f in findings)
+
+
 def test_run_scan_never_touches_the_network_by_default(sample_target, monkeypatch):
     def _boom(*args, **kwargs):
         raise AssertionError("run_scan must not hit the network unless online=True")

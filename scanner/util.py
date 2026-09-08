@@ -32,7 +32,17 @@ TEXT_EXTENSIONS = {
 
 
 def iter_files(target: Path) -> Iterator[Path]:
-    """Yield every file under target, skipping noise directories."""
+    """Yield every file under target, skipping noise directories.
+
+    target may be a directory (the usual case) or a single file — pointing
+    the scanner at one file you're curious about is a reasonable thing to
+    want, and Path.rglob() silently yields nothing if target isn't a
+    directory, so that case is handled explicitly here rather than by every
+    check rediscovering the same surprise.
+    """
+    if target.is_file():
+        yield target
+        return
     for path in target.rglob("*"):
         if path.is_dir():
             continue
@@ -52,6 +62,19 @@ def iter_text_files(target: Path) -> Iterator[Path]:
     for path in iter_files(target):
         if path.suffix in TEXT_EXTENSIONS or path.name in TEXT_EXTENSIONS:
             yield path
+
+
+def relative_asset_path(path: Path, target: Path) -> str:
+    """Display path for a finding's affected_asset.
+
+    When target is a directory, this is just path relative to it, as
+    before. When target is itself the file being scanned, path == target,
+    and path.relative_to(target) would collapse to "." — technically
+    correct but reads as broken in a report, so show the filename instead.
+    """
+    if target.is_file():
+        return path.name
+    return str(path.relative_to(target))
 
 
 def read_text_safe(path: Path) -> str | None:

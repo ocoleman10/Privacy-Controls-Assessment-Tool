@@ -24,7 +24,7 @@ from pathlib import Path
 
 from scanner.checks.base import Check, make_finding
 from scanner.finding import Finding
-from scanner.util import iter_files, read_text_safe
+from scanner.util import iter_files, read_text_safe, relative_asset_path
 
 UNPINNED_CHECK_ID = "PCAT-DEP-UNPINNED"
 VULN_CHECK_ID = "PCAT-DEP-VULN"
@@ -57,7 +57,7 @@ class UnpinnedDependencyCheck(Check):
             text = read_text_safe(path)
             if text is None:
                 continue
-            rel = path.relative_to(target)
+            rel = relative_asset_path(path, target)
             for lineno, req in _parse_requirements_txt(text):
                 if not _PINNED_RE.match(req):
                     findings.append(
@@ -122,7 +122,7 @@ class VulnerableDependencyCheck(Check):
             if not vulns:
                 continue
             ids = ", ".join(v.get("id", "?") for v in vulns[:5])
-            rel = path.relative_to(target)
+            rel = relative_asset_path(path, target)
             findings.append(
                 make_finding(
                     VULN_CHECK_ID,

@@ -22,7 +22,7 @@ from pathlib import Path
 
 from scanner.checks.base import Check, make_finding
 from scanner.finding import Finding
-from scanner.util import iter_files
+from scanner.util import iter_files, relative_asset_path
 
 CHECK_ID = "PCAT-PERM"
 
@@ -53,7 +53,7 @@ class PermissionsCheck(Check):
             if not (world_readable or world_writable):
                 continue
 
-            rel = path.relative_to(target)
+            rel = relative_asset_path(path, target)
             perms = stat.filemode(mode)
             kind = "world-writable" if world_writable else "world-readable"
             findings.append(

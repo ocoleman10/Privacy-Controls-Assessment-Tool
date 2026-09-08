@@ -14,7 +14,7 @@ from pathlib import Path
 
 from scanner.checks.base import Check, make_finding
 from scanner.finding import Finding, Severity
-from scanner.util import iter_files, is_git_ignored, is_git_tracked
+from scanner.util import iter_files, is_git_ignored, is_git_tracked, relative_asset_path
 
 CHECK_ID = "PCAT-ENV"
 
@@ -24,6 +24,11 @@ class EnvFileCheck(Check):
 
     def run(self, target: Path) -> list[Finding]:
         findings: list[Finding] = []
+        # is_git_tracked shells out with this as its cwd, which must be a
+        # directory — when target is itself the file being scanned, walk up
+        # to its parent so git still has a working tree to run in.
+        repo_root = target if target.is_dir() else target.parent
+
         for path in iter_files(target):
             if not (path.name == ".env" or path.name.startswith(".env.")):
                 continue
@@ -32,8 +37,8 @@ class EnvFileCheck(Check):
             if is_git_ignored(path):
                 continue
 
-            rel = path.relative_to(target)
-            tracked = is_git_tracked(path, target)
+            rel = relative_asset_path(path, target)
+            tracked = is_git_tracked(path, repo_root)
             finding = make_finding(
                 CHECK_ID,
                 affected_asset=str(rel),
