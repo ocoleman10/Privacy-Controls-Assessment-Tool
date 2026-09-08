@@ -6,7 +6,7 @@ produces a consulting-style findings report — finding ID, severity, affected
 asset, control reference, evidence, remediation, and estimated remediation
 effort.
 
-This is advisory tooling, not offensive security. It doesn't exploit
+This is advisory tooling. It doesn't exploit
 anything or probe a running system from the outside; it reads source and
 config and tells you what a controls assessor would flag and why.
 
