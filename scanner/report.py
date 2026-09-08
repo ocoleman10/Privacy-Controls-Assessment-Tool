@@ -15,8 +15,7 @@ from scanner.finding import Finding, Severity
 SCOPE_STATEMENT = (
     "This assessment covers only systems the assessor owns and controls: the "
     "repository, source tree, or configuration under scan at the target path "
-    "given on the command line. No third-party, employer, or academic "
-    "infrastructure was scanned as part of this report."
+    "given on the command line."
 )
 
 
