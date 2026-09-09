@@ -43,6 +43,8 @@ class PermissionsCheck(Check):
         for path in iter_files(target):
             if not _SENSITIVE_NAME_RE.search(path.name):
                 continue
+            if path.name in (".env.example", ".env.sample"):
+                continue  # template files are the recommended pattern, not a finding
             try:
                 mode = path.stat().st_mode
             except OSError:

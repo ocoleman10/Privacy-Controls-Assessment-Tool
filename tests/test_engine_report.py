@@ -1,13 +1,21 @@
 import json
+import os
 import urllib.request
 
 from scanner.engine import run_scan
 from scanner.report import render_json, render_markdown
 
-# 2 secrets + 1 env file + 2 PII-in-logs + 1 encryption + 2 unpinned deps.
-# Permissions never fires here (no matching filenames in the fixture) and
-# vulnerable-dependency never fires by default (offline).
-EXPECTED_SAMPLE_TARGET_FINDINGS = 8
+# 2 secrets + 1 env file + 2 PII-in-logs + 1 encryption + 2 unpinned deps = 8,
+# the same on every platform. Vulnerable-dependency never fires by default
+# (offline). Permissions is the one platform-dependent check: it's a no-op on
+# native Windows (POSIX mode bits don't exist there), but on a real POSIX
+# checkout (Linux CI, WSL, macOS) sample_target/.env is genuinely
+# world-readable -- git only tracks the executable bit, not read/write bits,
+# so a fresh clone always gets the umask-default mode regardless of what was
+# committed. That's not a bug in the fixture: a committed .env file that's
+# also world-readable really is one more real finding, not a false positive,
+# so the expected count is +1 on POSIX rather than something to suppress.
+EXPECTED_SAMPLE_TARGET_FINDINGS = 9 if os.name == "posix" else 8
 
 
 def test_run_scan_produces_expected_shape(sample_target):
