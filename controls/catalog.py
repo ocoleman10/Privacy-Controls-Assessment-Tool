@@ -219,12 +219,12 @@ CATALOG: dict[str, CheckMeta] = {
             ),
         ],
         remediation=(
-            "Re-enable TLS/SSL on the connection (remove `sslmode=disable` "
-            "or equivalent flags) and confirm the underlying data store has "
-            "encryption at rest enabled. Treat a disabled encryption flag in "
-            "config as a deliberate finding, not a default to leave in place "
-            "for local development without a matching override for "
-            "production."
+            "Re-enable TLS/SSL on the connection (remove the explicit "
+            "disabled-SSL-mode setting or equivalent flag) and confirm the "
+            "underlying data store has encryption at rest enabled. Treat a "
+            "disabled encryption flag in config as a deliberate finding, not "
+            "a default to leave in place for local development without a "
+            "matching override for production."
         ),
         estimated_effort="Low (flip a config flag) to Medium (if the data store lacks at-rest encryption entirely)",
     ),

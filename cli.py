@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from scanner.engine import run_scan
+from scanner.finding import Severity
 from scanner.report import render_json, render_markdown
 
 
@@ -45,6 +46,14 @@ def main(argv: list[str] | None = None) -> int:
         help="Query osv.dev for known-vulnerable pinned dependencies. Off by default "
         "so a plain scan never depends on network access.",
     )
+    parser.add_argument(
+        "--fail-on",
+        choices=["critical", "high", "medium", "low"],
+        default=None,
+        help="Exit nonzero if any finding is at least this severe. Lets a CI step "
+        "running pcat actually gate a build instead of just printing a report "
+        "nobody is forced to read. Off by default -- a plain scan always exits 0.",
+    )
     args = parser.parse_args(argv)
 
     target = args.target.resolve()
@@ -65,6 +74,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Report written to {args.output} ({len(findings)} findings).")
     else:
         print(output)
+
+    if args.fail_on:
+        threshold = Severity(args.fail_on.capitalize())
+        if any(f.severity.rank <= threshold.rank for f in findings):
+            return 1
 
     return 0
 

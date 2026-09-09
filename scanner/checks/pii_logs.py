@@ -4,10 +4,10 @@ Two detection modes on any line that looks like a logging/print call:
 
 1. A literal PII-shaped value appears directly in the line (SSN, credit card,
    email) — high-confidence, this is PII in the source itself.
-2. A variable with a PII-suggestive name is interpolated into the call
-   (e.g. `logger.info(f"processing {ssn}")`) — the more realistic pattern in
-   real code, since actual PII values rarely appear as source literals but
-   the fields carrying them do get logged.
+2. A variable whose name suggests PII (a Social Security Number field, a
+   card number, and so on) is interpolated into the call — the more
+   realistic pattern in real code, since actual PII values rarely appear as
+   source literals but the fields carrying them do get logged.
 """
 
 from __future__ import annotations

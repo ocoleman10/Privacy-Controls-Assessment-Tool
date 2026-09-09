@@ -1,5 +1,7 @@
 # Privacy and Controls Assessment Tool (PCAT)
 
+[![CI](https://github.com/ocoleman10/Privacy-Controls-Assessment-Tool/actions/workflows/ci.yml/badge.svg)](https://github.com/ocoleman10/Privacy-Controls-Assessment-Tool/actions/workflows/ci.yml)
+
 A scanner that reviews a codebase for privacy and security hygiene problems,
 maps each finding to a named control (NIST CSF 2.0 / CIS Controls v8), and
 produces a consulting-style findings report — finding ID, severity, affected
@@ -32,7 +34,7 @@ on your PATH.)
 ## Usage
 
 ```
-py cli.py <target-path> [-o report.md] [--format md|json] [--online]
+py cli.py <target-path> [-o report.md] [--format md|json] [--online] [--fail-on LEVEL]
 ```
 
 - `<target-path>` — the directory to scan.
@@ -42,6 +44,11 @@ py cli.py <target-path> [-o report.md] [--format md|json] [--online]
 - `--online` — also query [osv.dev](https://osv.dev) for known public
   advisories against exactly-pinned dependency versions. Off by default, so
   a plain scan never depends on network access.
+- `--fail-on {critical,high,medium,low}` — exit nonzero if any finding is at
+  least this severe, so a CI step running PCAT can actually gate a build
+  instead of just printing a report nobody's forced to read. Off by default —
+  a plain scan always exits 0. This repo's own [CI workflow](.github/workflows/ci.yml)
+  uses it to scan `scanner/`, `controls/`, and `cli.py` on every push/PR.
 
 Try it against the fixture that ships with this repo:
 
@@ -80,6 +87,8 @@ consulted.
 ## Project layout
 
 ```
+.github/workflows/ci.yml   runs the test suite + a self-scan (--fail-on high)
+                            on every push/PR
 cli.py                     entrypoint
 scanner/
   finding.py                Finding/Severity/ControlRef data model
@@ -105,5 +114,5 @@ tests/                      pytest suite: one file per check + engine/report
 py -m pytest
 ```
 
-19 tests pass on native Windows; 2 more (real POSIX permission-bit checks)
+24 tests pass on native Windows; 2 more (real POSIX permission-bit checks)
 run under WSL — see `tests/test_permissions.py`.

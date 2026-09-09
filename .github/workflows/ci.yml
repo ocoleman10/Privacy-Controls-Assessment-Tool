@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run test suite
+        run: pytest -q
+
+      - name: Scan PCAT's own source for privacy/security findings
+        # sample_target/ is a deliberately vulnerable fixture used to test
+        # detection -- it's excluded here on purpose, not scanned as if it
+        # were real production code. Real source is scanner/, controls/,
+        # and cli.py, and this gate fails the build on any High-or-worse
+        # finding in any of them.
+        run: |
+          python cli.py scanner --fail-on high
+          python cli.py controls --fail-on high
+          python cli.py cli.py --fail-on high
