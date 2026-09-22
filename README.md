@@ -4,7 +4,7 @@
 
 A scanner that reviews a codebase for privacy and security hygiene problems,
 maps each finding to a named control (NIST CSF 2.0 / CIS Controls v8), and
-produces a consulting-style findings report — finding ID, severity, affected
+produces a consulting-style findings report: finding ID, severity, affected
 asset, control reference, evidence, remediation, and estimated remediation
 effort.
 
@@ -26,7 +26,7 @@ this limitation up front (see `SCOPE_STATEMENT` in `scanner/report.py`)
 py -m pip install -r requirements.txt
 ```
 
-The scanner itself has **zero third-party runtime dependencies** — `requirements.txt` only pulls in `pytest`, for the test suite.
+The scanner itself has **zero third-party runtime dependencies**. `requirements.txt` only pulls in `pytest`, for the test suite.
 
 (`py` is the Windows launcher; use `python3` on macOS/Linux/WSL if `py` isn't
 on your PATH.)
@@ -37,16 +37,16 @@ on your PATH.)
 py cli.py <target-path> [-o report.md] [--format md|json] [--online] [--fail-on LEVEL]
 ```
 
-- `<target-path>` — the directory to scan.
-- `-o/--output` — write the report to a file instead of stdout.
-- `--format` — `md` (default, the human-facing report) or `json`
+- `<target-path>`: the directory to scan.
+- `-o/--output`: write the report to a file instead of stdout.
+- `--format`: `md` (default, the human-facing report) or `json`
   (machine-readable).
-- `--online` — also query [osv.dev](https://osv.dev) for known public
+- `--online`: also query [osv.dev](https://osv.dev) for known public
   advisories against exactly-pinned dependency versions. Off by default, so
   a plain scan never depends on network access.
-- `--fail-on {critical,high,medium,low}` — exit nonzero if any finding is at
+- `--fail-on {critical,high,medium,low}`: exit nonzero if any finding is at
   least this severe, so a CI step running PCAT can actually gate a build
-  instead of just printing a report nobody's forced to read. Off by default —
+  instead of just printing a report nobody's forced to read. Off by default;
   a plain scan always exits 0. This repo's own [CI workflow](.github/workflows/ci.yml)
   uses it to scan `scanner/`, `controls/`, and `cli.py` on every push/PR.
 
@@ -61,21 +61,21 @@ py cli.py sample_target
 | Check | What it flags | Default severity |
 | --- | --- | --- |
 | `PCAT-SECRET` | Hardcoded secrets/API keys (provider-specific patterns plus a generic credential-shaped-name heuristic) | Critical |
-| `PCAT-ENV` | Committed `.env` files (Critical if tracked by git — an already-realized leak; High if merely present and ungitignored) | High/Critical |
+| `PCAT-ENV` | Committed `.env` files (Critical if tracked by git, an already-realized leak; High if merely present and ungitignored) | High/Critical |
 | `PCAT-PII-LOG` | PII (literal or field-name-suggestive) written to log/print calls | High |
 | `PCAT-DEP-UNPINNED` | Dependencies not pinned to an exact version | Medium |
 | `PCAT-DEP-VULN` | Pinned dependencies with a known public advisory (opt-in, `--online`) | High |
-| `PCAT-PERM` | World-readable/writable sensitive files — private keys, `.pem`/`.pfx`/`.p12`, credentials/secrets files | High |
+| `PCAT-PERM` | World-readable/writable sensitive files: private keys, `.pem`/`.pfx`/`.p12`, credentials/secrets files | High |
 | `PCAT-ENCRYPT` | Disabled TLS/SSL or encryption flags (`sslmode=disable`, `ssl=false`, plaintext `http://` to a data/auth endpoint) | High |
 
-`PCAT-PERM` is a documented no-op on native Windows — POSIX permission bits
-don't exist there (NTFS uses ACLs instead). Run the scan from WSL for a real
-answer on that one check; everything else works the same on both.
+`PCAT-PERM` is a documented no-op on native Windows, since POSIX permission
+bits don't exist there (NTFS uses ACLs instead). Run the scan from WSL for a
+real answer on that one check; everything else works the same on both.
 
 ## The control mapping
 
 Every check cites a specific NIST CSF 2.0 subcategory and/or CIS Controls
-v8 safeguard in `controls/catalog.py` — that mapping is what makes this a
+v8 safeguard in `controls/catalog.py`. That mapping is what makes this a
 controls-assessment tool rather than a linter. The reference IDs and titles
 were verified against public NIST/CIS documentation (not recalled from
 memory) as of 2026-09-07; both frameworks are revised periodically, so
@@ -100,10 +100,10 @@ scanner/
     secrets.py, env_files.py, pii_logs.py, dependencies.py,
     permissions.py, encryption.py
 controls/
-  catalog.py                the control mapping — severity, control refs,
+  catalog.py                the control mapping: severity, control refs,
                              remediation text, effort estimate per check
 sample_target/              synthetic fixture with one intentional issue
-                             per check, plus negative cases — see its README
+                             per check, plus negative cases (see its README)
 tests/                      pytest suite: one file per check + engine/report
                              integration tests
 ```
@@ -115,4 +115,4 @@ py -m pytest
 ```
 
 24 tests pass on native Windows; 2 more (real POSIX permission-bit checks)
-run under WSL — see `tests/test_permissions.py`.
+run under WSL. See `tests/test_permissions.py`.
